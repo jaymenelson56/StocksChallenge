@@ -29,6 +29,16 @@ purchases = [
 
 ]
 
+def generate_summary(purchases):
+    purchase_summary = {}
+    for purchase in purchases:
+        symbol = purchase[0]
+        if symbol in purchase_summary:
+            purchase_summary[symbol].append(purchase)
+        else:
+            purchase_summary[symbol] = [purchase]
+    return purchase_summary
+
 def generate_report(ticker_symbols, purchases):
     report = "List of all purchases\n---------------------\n"
     for purchase in purchases:
@@ -39,4 +49,26 @@ def generate_report(ticker_symbols, purchases):
         report += f"{full_name} stock purchased for ${full_price} on {date}\n"
     return report
 
+def generate_portfolio(ticker_symbols, purchase_summary):
+    total_portfolio_value = 0
+    report_lines = []
+
+    for symbol, purchase_list in purchase_summary.items():
+        total_value = sum(shares * price for _, shares, _, price in purchase_list)
+        total_portfolio_value += total_value
+        full_name = ticker_symbols.get(symbol, "Unknown Company")
+        report_lines.append(f"* {full_name} Holdings: ${total_value}")
+
+    report_lines.append("\nPortfolio Total\n-----------------")
+    report_lines.append(f"Total value of stock in portfolio: ${total_portfolio_value}")
+
+    return "\n".join(report_lines)
+
 print(generate_report(ticker_symbols, purchases))
+
+purchase_summary = generate_summary(purchases)
+print("\nPurchase Summary:")
+for symbol, purchase_list in purchase_summary.items():
+    print(f"{symbol}: {purchase_list}")
+
+print(generate_portfolio(ticker_symbols, purchase_summary))
